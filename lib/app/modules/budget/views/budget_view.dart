@@ -586,25 +586,29 @@ class BudgetView extends GetView<BudgetController> {
                   .map((d) => d.amount)
                   .reduce((a, b) => a > b ? a : b) *
               1.2,
-          barGroups: budget.dailyBreakdown.asMap().entries.map((entry) {
-            return BarChartGroupData(
-              x: entry.key,
-              barRods: [
-                BarChartRodData(
-                  toY: entry.value.amount,
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF00B4DB), Color(0xFF0083B0)],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                  ),
-                  width: 20,
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(8),
-                  ),
-                ),
-              ],
-            );
-          }).toList(),
+          barGroups: budget.dailyBreakdown
+              .asMap()
+              .entries
+              .map<BarChartGroupData>((entry) {
+                return BarChartGroupData(
+                  x: entry.key,
+                  barRods: [
+                    BarChartRodData(
+                      toY: entry.value.amount,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF00B4DB), Color(0xFF0083B0)],
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                      ),
+                      width: 20,
+                      borderRadius: const BorderRadius.vertical(
+                        top: Radius.circular(8),
+                      ),
+                    ),
+                  ],
+                );
+              })
+              .toList(),
           titlesData: FlTitlesData(
             show: true,
             bottomTitles: AxisTitles(
