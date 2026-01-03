@@ -1,0 +1,129 @@
+// Prisma Schema for GlobeTrotter - Master Data Tables
+// Database architect: Senior Database Design
+// Phase: Master/Reference Tables Only
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ========================================
+// ENUMS
+// ========================================
+
+enum CostIndex {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum ActivityType {
+  FREE
+  PAID
+}
+
+
+model City {
+  id               String    @id @default(uuid())
+  name             String
+  country          String
+  countryCode      String    // ISO 3166-1 alpha-2 (e.g., US, IN, FR)
+  latitude         Float
+  longitude        Float
+  costIndex        CostIndex
+  popularityScore  Int       @default(0)
+  isActive         Boolean   @default(true)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  // Relations
+  activities       Activity[]
+  costReference    CostReference?
+
+  @@index([name])
+  @@index([country])
+  @@index([popularityScore])
+  @@index([isActive])
+  @@map("city_master")
+}
+
+
+model ActivityCategory {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  icon        String?    // Icon identifier or path
+  isActive    Boolean    @default(true)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  activities  Activity[]
+
+  @@index([name])
+  @@map("activity_category_master")
+}
+
+
+model Activity {
+  id               String           @id @default(uuid())
+  cityId           String
+  categoryId       String
+  name             String
+  description      String?
+  averageCost      Float?
+  durationInHours  Float?
+  activityType     ActivityType
+  popularityScore  Int              @default(0)
+  isActive         Boolean          @default(true)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+
+  // Foreign Keys & Relations
+  city             City             @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  category         ActivityCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([name])
+  @@index([cityId])
+  @@index([categoryId])
+  @@index([activityType])
+  @@index([popularityScore])
+  @@index([isActive])
+  @@map("activity_master")
+}
+
+
+model CostReference {
+  id                          String   @id @default(uuid())
+  cityId                      String   @unique
+  accommodationCostPerNight   Float    // Average hotel/accommodation cost
+  foodCostPerDay              Float    // Average daily food expense
+  localTransportCostPerDay    Float    // Average local transport (metro, bus, taxi)
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+
+  // Foreign Keys & Relations
+  city                        City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  @@index([cityId])
+  @@map("cost_reference_master")
+}
+
+
+model Currency {
+  id                String   @id @default(uuid())
+  code              String   @unique // ISO 4217 code (USD, INR, EUR, GBP, etc.)
+  symbol            String   // $, ₹, €, £
+  exchangeRateToUSD Float    // Current exchange rate to USD
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([code])
+  @@index([isActive])
+  @@map("currency_master")
+}
