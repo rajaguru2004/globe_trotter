@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import '../controllers/itinerary_controller.dart';
 import '../../../widgets/activity_card.dart';
 import '../../../widgets/empty_state.dart';
@@ -190,19 +189,10 @@ class ItineraryView extends GetView<ItineraryController> {
               children: [
                 AspectRatio(
                   aspectRatio: 16 / 9,
-                  child: CachedNetworkImage(
-                    imageUrl:
-                        stop.city.imageUrl ??
-                        'https://source.unsplash.com/800x600/?${stop.city.name},city',
-                    fit: BoxFit.cover,
-                    placeholder: (context, url) => Container(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      child: const Center(child: CircularProgressIndicator()),
-                    ),
-                    errorWidget: (context, url, error) => Container(
-                      color: theme.colorScheme.surfaceContainerHighest,
-                      child: const Icon(Icons.image_not_supported),
-                    ),
+                  child: _buildCityImage(
+                    stop.city.imageUrl,
+                    stop.city.name,
+                    theme,
                   ),
                 ),
                 Container(
@@ -476,6 +466,57 @@ class ItineraryView extends GetView<ItineraryController> {
           child: child,
         ),
       ),
+    );
+  }
+
+  Widget _buildCityImage(String? imageUrl, String cityName, ThemeData theme) {
+    // Check if imageUrl is null or empty
+    if (imageUrl == null || imageUrl.isEmpty) {
+      return Container(
+        color: theme.colorScheme.surfaceContainerHighest,
+        child: const Icon(Icons.location_city, size: 64),
+      );
+    }
+
+    // Check if it's a local asset (starts with 'assets/')
+    if (imageUrl.startsWith('assets/')) {
+      return Image.asset(
+        imageUrl,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [Colors.blue[300]!, Colors.purple[300]!],
+              ),
+            ),
+            child: const Center(
+              child: Icon(Icons.location_city, size: 64, color: Colors.white),
+            ),
+          );
+        },
+      );
+    }
+
+    // Otherwise, treat it as a network URL
+    return Image.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          color: theme.colorScheme.surfaceContainerHighest,
+          child: const Center(child: CircularProgressIndicator()),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          color: theme.colorScheme.surfaceContainerHighest,
+          child: const Icon(Icons.image_not_supported, size: 64),
+        );
+      },
     );
   }
 }
