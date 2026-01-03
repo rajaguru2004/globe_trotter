@@ -45,18 +45,37 @@ class ItineraryController extends GetxController {
 
   /// Show add city bottom sheet
   void showAddCitySheet(BuildContext context) {
+    final searchController = TextEditingController();
+    final filteredCities = MockCities.popularCities.obs;
+    final searchText = ''.obs;
+
+    void filterCities(String query) {
+      searchText.value = query;
+      if (query.isEmpty) {
+        filteredCities.value = MockCities.popularCities;
+      } else {
+        filteredCities.value = MockCities.popularCities
+            .where(
+              (city) =>
+                  city.name.toLowerCase().contains(query.toLowerCase()) ||
+                  city.country.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
+      }
+    }
+
     Get.bottomSheet(
       Container(
+        height: Get.height * 0.85,
         decoration: BoxDecoration(
           color: Theme.of(context).scaffoldBackgroundColor,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
             // Handle
             Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
+              margin: const EdgeInsets.only(top: 12, bottom: 8),
               width: 40,
               height: 4,
               decoration: BoxDecoration(
@@ -65,38 +84,273 @@ class ItineraryController extends GetxController {
               ),
             ),
 
-            // Title
+            // Header & Search
             Padding(
-              padding: const EdgeInsets.all(16),
-              child: Text(
-                'Add City',
-                style: Theme.of(context).textTheme.titleLarge,
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Title
+                  Text(
+                    'Add Destination',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'Choose a city for your trip',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Search Bar
+                  Obx(
+                    () => Container(
+                      decoration: BoxDecoration(
+                        color: Colors.grey[100],
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey[300]!, width: 1),
+                      ),
+                      child: TextField(
+                        controller: searchController,
+                        onChanged: filterCities,
+                        decoration: InputDecoration(
+                          hintText: 'Search cities...',
+                          hintStyle: TextStyle(color: Colors.grey[400]),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.grey[400],
+                          ),
+                          suffixIcon: searchText.value.isNotEmpty
+                              ? IconButton(
+                                  icon: Icon(
+                                    Icons.clear,
+                                    color: Colors.grey[400],
+                                  ),
+                                  onPressed: () {
+                                    searchController.clear();
+                                    filterCities('');
+                                  },
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 14,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 
-            // Cities List
+            // Cities Grid
             Expanded(
-              child: ListView.builder(
-                itemCount: MockCities.popularCities.length,
-                itemBuilder: (context, index) {
-                  final city = MockCities.popularCities[index];
-                  return ListTile(
-                    leading: const Icon(Icons.location_city),
-                    title: Text(city.name),
-                    subtitle: Text(city.country),
-                    onTap: () {
-                      Get.back();
-                      addCity(city);
-                    },
+              child: Obx(() {
+                if (filteredCities.isEmpty) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_off_rounded,
+                          size: 64,
+                          color: Colors.grey[300],
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          'No cities found',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(color: Colors.grey[600]),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Try a different search term',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.grey[400]),
+                        ),
+                      ],
+                    ),
                   );
-                },
-              ),
+                }
+
+                return GridView.builder(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    childAspectRatio: 0.85,
+                  ),
+                  itemCount: filteredCities.length,
+                  itemBuilder: (context, index) {
+                    final city = filteredCities[index];
+                    return _buildCityCard(context, city);
+                  },
+                );
+              }),
             ),
           ],
         ),
       ),
       isScrollControlled: true,
       enableDrag: true,
+      isDismissible: true,
+    );
+  }
+
+  /// Build city card widget
+  Widget _buildCityCard(BuildContext context, CityModel city) {
+    return GestureDetector(
+      onTap: () {
+        Get.back();
+        addCity(city);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(20),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // City Image
+              if (city.imageUrl != null)
+                Image.asset(
+                  city.imageUrl!,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Colors.blue[300]!, Colors.purple[300]!],
+                        ),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.location_city,
+                          size: 48,
+                          color: Colors.white,
+                        ),
+                      ),
+                    );
+                  },
+                )
+              else
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [Colors.blue[300]!, Colors.purple[300]!],
+                    ),
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.location_city,
+                      size: 48,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+
+              // Gradient Overlay
+              Container(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+                    stops: const [0.5, 1.0],
+                  ),
+                ),
+              ),
+
+              // City Info
+              Positioned(
+                left: 12,
+                right: 12,
+                bottom: 12,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      city.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: -0.5,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.location_on,
+                          size: 14,
+                          color: Colors.white70,
+                        ),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            city.country,
+                            style: const TextStyle(
+                              color: Colors.white70,
+                              fontSize: 13,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              // Add Icon
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.add, size: 20, color: Colors.blue),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
