@@ -13,7 +13,8 @@ class MockActivities {
         cost: 26.00,
         currency: '€',
         durationMinutes: 180,
-        imageUrl: 'https://source.unsplash.com/600x400/?eiffel-tower',
+        imageUrl:
+            'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg',
         location: 'Champ de Mars, Paris',
         rating: 4.8,
       ),
@@ -25,7 +26,8 @@ class MockActivities {
         cost: 17.00,
         currency: '€',
         durationMinutes: 240,
-        imageUrl: 'https://source.unsplash.com/600x400/?louvre,museum',
+        imageUrl:
+            'https://images.pexels.com/photos/374870/pexels-photo-374870.jpeg',
         location: 'Louvre, Paris',
         rating: 4.9,
       ),
@@ -37,7 +39,8 @@ class MockActivities {
         cost: 35.00,
         currency: '€',
         durationMinutes: 120,
-        imageUrl: 'https://source.unsplash.com/600x400/?seine,river,boat',
+        imageUrl:
+            'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg',
         location: 'Seine River, Paris',
         rating: 4.7,
       ),
@@ -49,7 +52,8 @@ class MockActivities {
         cost: 45.00,
         currency: '€',
         durationMinutes: 90,
-        imageUrl: 'https://source.unsplash.com/600x400/?french,food,bistro',
+        imageUrl:
+            'https://images.pexels.com/photos/374870/pexels-photo-374870.jpeg',
         location: 'Le Marais, Paris',
         rating: 4.6,
       ),
@@ -61,7 +65,8 @@ class MockActivities {
         cost: 20.00,
         currency: '€',
         durationMinutes: 150,
-        imageUrl: 'https://source.unsplash.com/600x400/?montmartre,paris',
+        imageUrl:
+            'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg',
         location: 'Montmartre, Paris',
         rating: 4.5,
       ),
@@ -77,7 +82,8 @@ class MockActivities {
         cost: 0.00,
         currency: '¥',
         durationMinutes: 120,
-        imageUrl: 'https://source.unsplash.com/600x400/?sensoji,temple',
+        imageUrl:
+            'https://images.pexels.com/photos/590478/pexels-photo-590478.jpeg',
         location: 'Asakusa, Tokyo',
         rating: 4.7,
       ),
@@ -89,7 +95,8 @@ class MockActivities {
         cost: 8500.00,
         currency: '¥',
         durationMinutes: 180,
-        imageUrl: 'https://source.unsplash.com/600x400/?sushi,making',
+        imageUrl:
+            'https://images.pexels.com/photos/590478/pexels-photo-590478.jpeg',
         location: 'Shibuya, Tokyo',
         rating: 4.9,
       ),
@@ -101,7 +108,8 @@ class MockActivities {
         cost: 3100.00,
         currency: '¥',
         durationMinutes: 150,
-        imageUrl: 'https://source.unsplash.com/600x400/?tokyo,skytree',
+        imageUrl:
+            'https://images.pexels.com/photos/590478/pexels-photo-590478.jpeg',
         location: 'Sumida, Tokyo',
         rating: 4.6,
       ),
@@ -141,7 +149,8 @@ class MockActivities {
         cost: 24.00,
         currency: '\$',
         durationMinutes: 240,
-        imageUrl: 'https://source.unsplash.com/600x400/?statue-liberty',
+        imageUrl:
+            'https://images.pexels.com/photos/466685/pexels-photo-466685.jpeg',
         location: 'Liberty Island, NY',
         rating: 4.8,
       ),
@@ -153,7 +162,8 @@ class MockActivities {
         cost: 45.00,
         currency: '\$',
         durationMinutes: 180,
-        imageUrl: 'https://source.unsplash.com/600x400/?central-park,bike',
+        imageUrl:
+            'https://images.pexels.com/photos/374870/pexels-photo-374870.jpeg',
         location: 'Central Park, NY',
         rating: 4.6,
       ),
@@ -165,7 +175,8 @@ class MockActivities {
         cost: 150.00,
         currency: '\$',
         durationMinutes: 180,
-        imageUrl: 'https://source.unsplash.com/600x400/?broadway,theater',
+        imageUrl:
+            'https://images.pexels.com/photos/466685/pexels-photo-466685.jpeg',
         location: 'Times Square, NY',
         rating: 4.9,
       ),
@@ -205,7 +216,8 @@ class MockActivities {
         cost: 35.00,
         currency: '€',
         durationMinutes: 240,
-        imageUrl: 'https://source.unsplash.com/600x400/?colosseum,rome',
+        imageUrl:
+            'https://images.pexels.com/photos/753639/pexels-photo-753639.jpeg',
         location: 'Rome, Italy',
         rating: 4.9,
       ),
@@ -217,7 +229,8 @@ class MockActivities {
         cost: 30.00,
         currency: '€',
         durationMinutes: 240,
-        imageUrl: 'https://source.unsplash.com/600x400/?vatican,sistine',
+        imageUrl:
+            'https://images.pexels.com/photos/753639/pexels-photo-753639.jpeg',
         location: 'Vatican City',
         rating: 4.8,
       ),
@@ -269,7 +282,8 @@ class MockActivities {
         cost: 29.00,
         currency: '£',
         durationMinutes: 180,
-        imageUrl: 'https://source.unsplash.com/600x400/?tower-london',
+        imageUrl:
+            'https://images.pexels.com/photos/672532/pexels-photo-672532.jpeg',
         location: 'Tower Hill, London',
         rating: 4.7,
       ),
@@ -281,7 +295,8 @@ class MockActivities {
         cost: 0.00,
         currency: '£',
         durationMinutes: 240,
-        imageUrl: 'https://source.unsplash.com/600x400/?british-museum',
+        imageUrl:
+            'https://images.pexels.com/photos/374870/pexels-photo-374870.jpeg',
         location: 'Bloomsbury, London',
         rating: 4.8,
       ),
@@ -293,7 +308,8 @@ class MockActivities {
         cost: 25.00,
         currency: '£',
         durationMinutes: 120,
-        imageUrl: 'https://source.unsplash.com/600x400/?thames,river',
+        imageUrl:
+            'https://images.pexels.com/photos/672532/pexels-photo-672532.jpeg',
         location: 'Thames River, London',
         rating: 4.5,
       ),
@@ -333,7 +349,8 @@ class MockActivities {
         cost: 26.00,
         currency: '€',
         durationMinutes: 150,
-        imageUrl: 'https://source.unsplash.com/600x400/?sagrada-familia',
+        imageUrl:
+            'https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg',
         location: 'Barcelona, Spain',
         rating: 4.9,
       ),
@@ -345,7 +362,8 @@ class MockActivities {
         cost: 10.00,
         currency: '€',
         durationMinutes: 120,
-        imageUrl: 'https://source.unsplash.com/600x400/?park-guell',
+        imageUrl:
+            'https://images.pexels.com/photos/1388030/pexels-photo-1388030.jpeg',
         location: 'Barcelona, Spain',
         rating: 4.7,
       ),
@@ -369,7 +387,8 @@ class MockActivities {
         cost: 0.00,
         currency: '€',
         durationMinutes: 240,
-        imageUrl: 'https://source.unsplash.com/600x400/?barceloneta,beach',
+        imageUrl:
+            'https://images.pexels.com/photos/457882/pexels-photo-457882.jpeg',
         location: 'Barceloneta, Barcelona',
         rating: 4.5,
       ),
@@ -397,7 +416,8 @@ class MockActivities {
         cost: 140.00,
         currency: 'AED',
         durationMinutes: 120,
-        imageUrl: 'https://source.unsplash.com/600x400/?burj-khalifa',
+        imageUrl:
+            'https://images.pexels.com/photos/2044434/pexels-photo-2044434.jpeg',
         location: 'Downtown Dubai',
         rating: 4.8,
       ),
@@ -409,7 +429,8 @@ class MockActivities {
         cost: 250.00,
         currency: 'AED',
         durationMinutes: 360,
-        imageUrl: 'https://source.unsplash.com/600x400/?dubai,desert',
+        imageUrl:
+            'https://images.pexels.com/photos/417173/pexels-photo-417173.jpeg',
         location: 'Dubai Desert',
         rating: 4.9,
       ),
@@ -433,7 +454,8 @@ class MockActivities {
         cost: 350.00,
         currency: 'AED',
         durationMinutes: 180,
-        imageUrl: 'https://source.unsplash.com/600x400/?dubai,marina',
+        imageUrl:
+            'https://images.pexels.com/photos/2044434/pexels-photo-2044434.jpeg',
         location: 'Dubai Marina',
         rating: 4.7,
       ),
