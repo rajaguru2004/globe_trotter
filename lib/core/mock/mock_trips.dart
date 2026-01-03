@@ -18,7 +18,8 @@ class MockTrips {
       startDate: DateTime.now().add(const Duration(days: 30)),
       endDate: DateTime.now().add(const Duration(days: 42)),
       status: TripStatus.upcoming,
-      coverImage: 'https://source.unsplash.com/800x600/?europe,travel',
+      coverImage:
+          'https://images.pexels.com/photos/338515/pexels-photo-338515.jpeg',
       isPublic: true,
       shareSlug: 'european-adventure-2026',
       createdAt: DateTime.now().subtract(const Duration(days: 15)),
@@ -81,7 +82,8 @@ class MockTrips {
       startDate: DateTime.now().add(const Duration(days: 60)),
       endDate: DateTime.now().add(const Duration(days: 70)),
       status: TripStatus.upcoming,
-      coverImage: 'https://source.unsplash.com/800x600/?asia,temple',
+      coverImage:
+          'https://images.pexels.com/photos/590478/pexels-photo-590478.jpeg',
       isPublic: false,
       createdAt: DateTime.now().subtract(const Duration(days: 10)),
       updatedAt: DateTime.now().subtract(const Duration(days: 1)),
@@ -124,7 +126,8 @@ class MockTrips {
       startDate: DateTime.now().subtract(const Duration(days: 2)),
       endDate: DateTime.now().add(const Duration(days: 3)),
       status: TripStatus.ongoing,
-      coverImage: 'https://source.unsplash.com/800x600/?new-york,skyline',
+      coverImage:
+          'https://images.pexels.com/photos/466685/pexels-photo-466685.jpeg',
       isPublic: true,
       shareSlug: 'nyc-city-break',
       createdAt: DateTime.now().subtract(const Duration(days: 20)),
@@ -158,7 +161,8 @@ class MockTrips {
       startDate: DateTime.now().subtract(const Duration(days: 60)),
       endDate: DateTime.now().subtract(const Duration(days: 54)),
       status: TripStatus.completed,
-      coverImage: 'https://source.unsplash.com/800x600/?london,tower-bridge',
+      coverImage:
+          'https://images.pexels.com/photos/672532/pexels-photo-672532.jpeg',
       isPublic: true,
       shareSlug: 'london-calling-2025',
       createdAt: DateTime.now().subtract(const Duration(days: 90)),
