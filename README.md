@@ -2,6 +2,10 @@
 
 # 🌍 GlobeTrotter – Personalized Travel Planning App
 
+## 📲 Download the App
+
+**[📥 Download GlobeTrotter APK](https://drive.google.com/file/d/1OhviGKfii3959Ag7IhJWUZEUjwgLYs1h/view?usp=sharing)**
+
 I have hosted the backend using Docker CI/CD in my own server with this link
      https://uaterp.skillhiveinnovations.com/api
 
