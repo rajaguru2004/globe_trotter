@@ -1,22 +1,15 @@
 import 'package:get/get.dart';
 import '../../../data/models/trip_model.dart';
 import '../../../data/models/city_model.dart';
-import '../../../data/models/user_model.dart';
-import '../../../data/repositories/trip_repository.dart';
-import '../../auth/controllers/auth_controller.dart';
+import '../../../../core/mock/mock_trips.dart';
+import '../../../../core/mock/mock_cities.dart';
 
 /// Dashboard controller
 class DashboardController extends GetxController {
-  final TripRepository _tripRepository = TripRepository();
-  final AuthController _authController = Get.find<AuthController>();
-
   // Observable state
   final RxList<TripModel> upcomingTrips = <TripModel>[].obs;
   final RxList<CityModel> popularCities = <CityModel>[].obs;
   final RxBool isLoading = false.obs;
-  final RxString errorMessage = ''.obs;
-
-  UserModel? get currentUser => _authController.currentUser.value;
 
   @override
   void onInit() {
@@ -24,48 +17,21 @@ class DashboardController extends GetxController {
     loadDashboardData();
   }
 
-  /// Load dashboard data
+  /// Load dashboard data from mock
   Future<void> loadDashboardData() async {
     try {
       isLoading.value = true;
-      errorMessage.value = '';
 
-      // Load dashboard overview
-      final overview = await _tripRepository.getDashboardOverview();
+      // Simulate network delay for realistic feel
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      // Parse upcoming trips
-      if (overview['upcomingTrips'] != null) {
-        upcomingTrips.value = (overview['upcomingTrips'] as List)
-            .map((trip) => TripModel.fromJson(trip))
-            .toList();
-      }
-
-      // Parse popular cities
-      if (overview['popularCities'] != null) {
-        popularCities.value = (overview['popularCities'] as List)
-            .map((city) => CityModel.fromJson(city))
-            .toList();
-      }
-
-      // If overview doesn't provide these, fetch separately
-      if (upcomingTrips.isEmpty) {
-        await loadUpcomingTrips();
-      }
+      // Load data from mock
+      upcomingTrips.value = MockTrips.getUpcomingTrips();
+      popularCities.value = MockCities.popularCities;
     } catch (e) {
-      errorMessage.value = e.toString();
       print('Dashboard load error: $e');
     } finally {
       isLoading.value = false;
-    }
-  }
-
-  /// Load upcoming trips
-  Future<void> loadUpcomingTrips() async {
-    try {
-      final trips = await _tripRepository.getTrips(status: TripStatus.upcoming);
-      upcomingTrips.value = trips.take(5).toList();
-    } catch (e) {
-      print('Load upcoming trips error: $e');
     }
   }
 
@@ -76,19 +42,16 @@ class DashboardController extends GetxController {
 
   /// Navigate to trips screen
   void goToTrips() {
-    // TODO: Navigate to trips screen when implemented
-    Get.snackbar('Coming Soon', 'Trips screen coming soon');
+    Get.toNamed('/trips');
   }
 
   /// Navigate to create trip
   void goToCreateTrip() {
-    // TODO: Navigate to create trip screen when implemented
-    Get.snackbar('Coming Soon', 'Create trip screen coming soon');
+    Get.toNamed('/create-trip');
   }
 
-  /// Navigate to trip detail
+  /// Navigate to trip detail (itinerary)
   void goToTripDetail(String tripId) {
-    // TODO: Navigate to trip detail when implemented
-    Get.snackbar('Coming Soon', 'Trip detail screen coming soon');
+    Get.toNamed('/itinerary', arguments: {'tripId': tripId});
   }
 }

@@ -54,6 +54,7 @@ dependencies:
   shimmer: ^3.0.0
   lottie: ^3.0.0
   flutter_slidable: ^3.0.1
+  reorderables: ^0.6.0
   
   # Charts
   fl_chart: ^0.66.0
