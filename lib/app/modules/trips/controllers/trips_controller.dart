@@ -46,23 +46,17 @@ class TripsController extends GetxController
 
   /// Delete trip
   void deleteTrip(String tripId) {
-    Get.defaultDialog(
-      title: 'Delete Trip',
-      middleText: 'Are you sure you want to delete this trip?',
-      textConfirm: 'Delete',
-      textCancel: 'Cancel',
-      confirmTextColor: Get.theme.colorScheme.onError,
-      buttonColor: Get.theme.colorScheme.error,
-      onConfirm: () {
-        MockTrips.deleteTrip(tripId);
-        loadTrips(); // Reload trips
-        Get.back(); // Close dialog
-        Get.snackbar(
-          'Deleted',
-          'Trip deleted successfully',
-          snackPosition: SnackPosition.BOTTOM,
-        );
-      },
+    MockTrips.deleteTrip(tripId);
+    loadTrips(); // Reload trips
+    Get.snackbar(
+      'Trip Deleted',
+      'Your trip has been removed successfully',
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: const Color(0xFF38B2AC),
+      colorText: Colors.white,
+      margin: const EdgeInsets.all(16),
+      borderRadius: 12,
+      duration: const Duration(seconds: 2),
     );
   }
 
