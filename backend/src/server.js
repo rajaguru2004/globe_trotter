@@ -1,9 +1,16 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import userRoutes from './routes/userRoutes.js';
-import tripRoutes from './routes/tripRoutes.js';
 import prisma from './config/database.js';
+import errorHandler from './middlewares/errorHandler.js';
+
+// Route imports
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
+import tripRoutes from './routes/trip.routes.js';
+import itineraryRoutes from './routes/itinerary.routes.js';
+import combinedRoutes from './routes/combined.routes.js';
+import adminRoutes from './routes/admin.routes.js';
 
 // Load environment variables
 dotenv.config();
@@ -32,7 +39,8 @@ app.get('/health', async (req, res) => {
         res.status(200).json({
             success: true,
             message: 'Server is running',
-            database: 'Connected'
+            database: 'Connected',
+            timestamp: new Date().toISOString()
         });
     } catch (error) {
         res.status(503).json({
@@ -45,8 +53,12 @@ app.get('/health', async (req, res) => {
 });
 
 // API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/itinerary', itineraryRoutes);
+app.use('/api', combinedRoutes); // Search, Budget, Dashboard, Sharing
+app.use('/api/admin', adminRoutes);
 
 // 404 handler
 app.use((req, res) => {
@@ -56,31 +68,66 @@ app.use((req, res) => {
     });
 });
 
-// Global error handler
-app.use((err, req, res, next) => {
-    console.error('Unhandled error:', err);
-    res.status(500).json({
-        success: false,
-        error: 'Internal server error',
-        message: process.env.NODE_ENV === 'development' ? err.message : undefined
-    });
-});
+// Global error handler (must be last)
+app.use(errorHandler);
 
 // Start server
 const server = app.listen(PORT, () => {
     console.log(`
 ╔═══════════════════════════════════════════════════════╗
-║  🚀 Globe Trotter Backend Server                      ║
+║  🌍 GlobeTrotter Backend API Server                   ║
 ║                                                        ║
 ║  Status:     Running                                  ║
 ║  Port:       ${PORT}                                      ║
 ║  Mode:       ${process.env.NODE_ENV || 'development'}                            ║
 ║  Database:   PostgreSQL (Prisma)                      ║
 ║                                                        ║
-║  Endpoints:                                           ║
-║  • GET  /health                                       ║
-║  • /api/users   - User management                     ║
-║  • /api/trips   - Trip management                     ║
+║  🔐 Authentication:                                    ║
+║  • POST  /api/auth/register                           ║
+║  • POST  /api/auth/login                              ║
+║  • GET   /api/auth/me                                 ║
+║                                                        ║
+║  👤 User Management:                                   ║
+║  • GET   /api/users/profile                           ║
+║  • PUT   /api/users/profile                           ║
+║  • DEL   /api/users/account                           ║
+║                                                        ║
+║  ✈️  Trip Management:                                  ║
+║  • POST  /api/trips                                   ║
+║  • GET   /api/trips                                   ║
+║  • GET   /api/trips/:id                               ║
+║  • PUT   /api/trips/:id                               ║
+║  • DEL   /api/trips/:id                               ║
+║                                                        ║
+║  🗺️  Itinerary Builder:                                ║
+║  • POST  /api/itinerary/trips/:id/stops               ║
+║  • PUT   /api/itinerary/stops/:id                     ║
+║  • DEL   /api/itinerary/stops/:id                     ║
+║  • POST  /api/itinerary/trips/:id/stops/reorder       ║
+║  • POST  /api/itinerary/stops/:id/activities          ║
+║  • PUT   /api/itinerary/activities/:id                ║
+║  • DEL   /api/itinerary/activities/:id                ║
+║                                                        ║
+║  🔍 Search:                                            ║
+║  • GET   /api/cities/search?q=...                     ║
+║  • GET   /api/activities/search?q=...                 ║
+║                                                        ║
+║  💰 Budget & Dashboard:                                ║
+║  • GET   /api/trips/:id/budget                        ║
+║  • GET   /api/dashboard/overview                      ║
+║                                                        ║
+║  🌐 Sharing & Community:                               ║
+║  • POST  /api/trips/:id/share                         ║
+║  • GET   /api/shared/:slug                            ║
+║  • GET   /api/community/feed                          ║
+║  • POST  /api/community/shared-trips/:id/copy         ║
+║                                                        ║
+║  🛠️  Admin (ADMIN role required):                      ║
+║  • GET   /api/admin/stats                             ║
+║  • GET   /api/admin/top-cities                        ║
+║                                                        ║
+║  📝 Health Check:                                      ║
+║  • GET   /health                                      ║
 ╚═══════════════════════════════════════════════════════╝
   `);
 });

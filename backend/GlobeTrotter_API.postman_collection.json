@@ -1,0 +1,1229 @@
+{
+    "info": {
+        "name": "GlobeTrotter Backend API",
+        "description": "Complete API collection for GlobeTrotter travel planning application with all endpoints and example requests",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+        "_postman_id": "globetrotter-api-2026",
+        "version": "1.0.0"
+    },
+    "auth": {
+        "type": "bearer",
+        "bearer": [
+            {
+                "key": "token",
+                "value": "{{authToken}}",
+                "type": "string"
+            }
+        ]
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:3000/api",
+            "type": "string"
+        },
+        {
+            "key": "authToken",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "userId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "tripId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "stopId",
+            "value": "",
+            "type": "string"
+        },
+        {
+            "key": "activityId",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "🔐 Authentication",
+            "item": [
+                {
+                    "name": "Register User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.collectionVariables.set('authToken', response.data.token);",
+                                    "    pm.collectionVariables.set('userId', response.data.user.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john.doe@globetrotter.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/register",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user account. Password must be at least 8 characters with uppercase, lowercase, and numbers."
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "POST",
+                                "header": [],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"email\": \"john.doe@globetrotter.com\",\n  \"password\": \"SecurePass123!\",\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\"\n}",
+                                    "options": {
+                                        "raw": {
+                                            "language": "json"
+                                        }
+                                    }
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/auth/register",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "auth",
+                                        "register"
+                                    ]
+                                }
+                            },
+                            "status": "Created",
+                            "code": 201,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"success\": true,\n  \"message\": \"User registered successfully\",\n  \"data\": {\n    \"user\": {\n      \"id\": \"uuid-here\",\n      \"email\": \"john.doe@globetrotter.com\",\n      \"firstName\": \"John\",\n      \"lastName\": \"Doe\",\n      \"role\": \"USER\",\n      \"createdAt\": \"2026-01-03T06:00:00.000Z\"\n    },\n    \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\"\n  }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Login",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.collectionVariables.set('authToken', response.data.token);",
+                                    "    pm.collectionVariables.set('userId', response.data.user.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"john.doe@globetrotter.com\",\n  \"password\": \"SecurePass123!\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/login",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login with email and password to receive JWT token"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Current User",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/auth/me",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "me"
+                            ]
+                        },
+                        "description": "Get currently authenticated user profile"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "👤 User Management",
+            "item": [
+                {
+                    "name": "Get User Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/profile",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "profile"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update User Profile",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"firstName\": \"Jonathan\",\n  \"lastName\": \"Doe\",\n  \"profileImage\": \"https://example.com/profile.jpg\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/users/profile",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "profile"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete User Account",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/users/account",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "users",
+                                "account"
+                            ]
+                        },
+                        "description": "Soft delete user account (sets isActive to false)"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "✈️ Trip Management",
+            "item": [
+                {
+                    "name": "Create Trip",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 201) {",
+                                    "    const response = pm.response.json();",
+                                    "    pm.collectionVariables.set('tripId', response.data.trip.id);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"European Summer Adventure\",\n  \"description\": \"A 2-week journey through Paris, Rome, and Barcelona\",\n  \"startDate\": \"2026-07-01T00:00:00Z\",\n  \"endDate\": \"2026-07-15T00:00:00Z\",\n  \"coverImage\": \"https://example.com/europe-trip.jpg\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/trips",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "trips"
+                            ]
+                        },
+                        "description": "Create a new trip. Status is auto-calculated based on dates."
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get All Trips",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trips?page=1&limit=10&status=UPCOMING",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "trips"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                },
+                                {
+                                    "key": "status",
+                                    "value": "UPCOMING",
+                                    "description": "Optional: DRAFT, UPCOMING, ONGOING, COMPLETED"
+                                }
+                            ]
+                        },
+                        "description": "Get all user trips with pagination and optional status filter"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Trip by ID",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trips/{{tripId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "trips",
+                                "{{tripId}}"
+                            ]
+                        },
+                        "description": "Get detailed trip information including stops and activities"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Update Trip",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"European Summer Adventure - Updated\",\n  \"description\": \"Extended 3-week journey\",\n  \"endDate\": \"2026-07-22T00:00:00Z\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/trips/{{tripId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "trips",
+                                "{{tripId}}"
+                            ]
+                        }
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Delete Trip",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trips/{{tripId}}",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "trips",
+                                "{{tripId}}"
+                            ]
+                        },
+                        "description": "Soft delete trip (sets isDeleted to true)"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "🗺️ Itinerary Builder",
+            "item": [
+                {
+                    "name": "Trip Stops",
+                    "item": [
+                        {
+                            "name": "Add Stop to Trip",
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "if (pm.response.code === 201) {",
+                                            "    const response = pm.response.json();",
+                                            "    pm.collectionVariables.set('stopId', response.data.stop.id);",
+                                            "}"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ],
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{authToken}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"cityId\": \"city-uuid-from-master-data\",\n  \"startDate\": \"2026-07-01T00:00:00Z\",\n  \"endDate\": \"2026-07-05T00:00:00Z\",\n  \"orderIndex\": 0\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/itinerary/trips/{{tripId}}/stops",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "itinerary",
+                                        "trips",
+                                        "{{tripId}}",
+                                        "stops"
+                                    ]
+                                },
+                                "description": "Add a city stop to trip itinerary"
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Stop",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{authToken}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PUT",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"startDate\": \"2026-07-01T00:00:00Z\",\n  \"endDate\": \"2026-07-06T00:00:00Z\",\n  \"orderIndex\": 0\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/itinerary/stops/{{stopId}}",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "itinerary",
+                                        "stops",
+                                        "{{stopId}}"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Stop",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{authToken}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/itinerary/stops/{{stopId}}",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "itinerary",
+                                        "stops",
+                                        "{{stopId}}"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Reorder Stops",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{authToken}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"stops\": [\n    { \"id\": \"stop-uuid-1\", \"orderIndex\": 0 },\n    { \"id\": \"stop-uuid-2\", \"orderIndex\": 1 },\n    { \"id\": \"stop-uuid-3\", \"orderIndex\": 2 }\n  ]\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/itinerary/trips/{{tripId}}/stops/reorder",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "itinerary",
+                                        "trips",
+                                        "{{tripId}}",
+                                        "stops",
+                                        "reorder"
+                                    ]
+                                },
+                                "description": "Reorder multiple stops in a single transaction"
+                            },
+                            "response": []
+                        }
+                    ]
+                },
+                {
+                    "name": "Activities",
+                    "item": [
+                        {
+                            "name": "Add Activity to Stop",
+                            "event": [
+                                {
+                                    "listen": "test",
+                                    "script": {
+                                        "exec": [
+                                            "if (pm.response.code === 201) {",
+                                            "    const response = pm.response.json();",
+                                            "    pm.collectionVariables.set('activityId', response.data.activity.id);",
+                                            "}"
+                                        ],
+                                        "type": "text/javascript"
+                                    }
+                                }
+                            ],
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{authToken}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "POST",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"activityMasterId\": \"activity-uuid-from-master\",\n  \"scheduledDate\": \"2026-07-02T00:00:00Z\",\n  \"startTime\": \"09:00\",\n  \"durationInHours\": 3,\n  \"estimatedCost\": 45.50\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/itinerary/stops/{{stopId}}/activities",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "itinerary",
+                                        "stops",
+                                        "{{stopId}}",
+                                        "activities"
+                                    ]
+                                },
+                                "description": "Schedule an activity for a trip stop"
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Update Activity",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{authToken}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "PUT",
+                                "header": [
+                                    {
+                                        "key": "Content-Type",
+                                        "value": "application/json"
+                                    }
+                                ],
+                                "body": {
+                                    "mode": "raw",
+                                    "raw": "{\n  \"scheduledDate\": \"2026-07-02T00:00:00Z\",\n  \"startTime\": \"10:00\",\n  \"durationInHours\": 4,\n  \"estimatedCost\": 50.00\n}"
+                                },
+                                "url": {
+                                    "raw": "{{baseUrl}}/itinerary/activities/{{activityId}}",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "itinerary",
+                                        "activities",
+                                        "{{activityId}}"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        },
+                        {
+                            "name": "Delete Activity",
+                            "request": {
+                                "auth": {
+                                    "type": "bearer",
+                                    "bearer": [
+                                        {
+                                            "key": "token",
+                                            "value": "{{authToken}}",
+                                            "type": "string"
+                                        }
+                                    ]
+                                },
+                                "method": "DELETE",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/itinerary/activities/{{activityId}}",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "itinerary",
+                                        "activities",
+                                        "{{activityId}}"
+                                    ]
+                                }
+                            },
+                            "response": []
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "🔍 Search",
+            "item": [
+                {
+                    "name": "Search Cities",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/cities/search?q=Paris&limit=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "cities",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "Paris",
+                                    "description": "Search query"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10",
+                                    "description": "Results limit (default: 20)"
+                                }
+                            ]
+                        },
+                        "description": "Search cities by name or country with fuzzy matching"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Search Activities",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/activities/search?q=museum&cityId=city-uuid&limit=20",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "activities",
+                                "search"
+                            ],
+                            "query": [
+                                {
+                                    "key": "q",
+                                    "value": "museum",
+                                    "description": "Search query"
+                                },
+                                {
+                                    "key": "cityId",
+                                    "value": "city-uuid",
+                                    "description": "Filter by city (optional)"
+                                },
+                                {
+                                    "key": "categoryId",
+                                    "value": "category-uuid",
+                                    "description": "Filter by category (optional)",
+                                    "disabled": true
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "20",
+                                    "description": "Results limit (default: 20)"
+                                }
+                            ]
+                        },
+                        "description": "Search activities with optional city/category filters"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "💰 Budget & Dashboard",
+            "item": [
+                {
+                    "name": "Get Trip Budget",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trips/{{tripId}}/budget",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "trips",
+                                "{{tripId}}",
+                                "budget"
+                            ]
+                        },
+                        "description": "Get comprehensive budget breakdown by city, day, and category"
+                    },
+                    "response": [
+                        {
+                            "name": "Success Response",
+                            "originalRequest": {
+                                "method": "GET",
+                                "header": [],
+                                "url": {
+                                    "raw": "{{baseUrl}}/trips/{{tripId}}/budget",
+                                    "host": [
+                                        "{{baseUrl}}"
+                                    ],
+                                    "path": [
+                                        "trips",
+                                        "{{tripId}}",
+                                        "budget"
+                                    ]
+                                }
+                            },
+                            "status": "OK",
+                            "code": 200,
+                            "_postman_previewlanguage": "json",
+                            "header": [
+                                {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                }
+                            ],
+                            "body": "{\n  \"success\": true,\n  \"data\": {\n    \"budget\": {\n      \"tripId\": \"uuid\",\n      \"tripName\": \"European Summer\",\n      \"totalEstimated\": 2500.00,\n      \"totalActual\": 1800.50,\n      \"totalRemaining\": 699.50,\n      \"budgetByCity\": [\n        {\n          \"cityId\": \"uuid\",\n          \"cityName\": \"Paris\",\n          \"estimated\": 1000.00,\n          \"actual\": 850.00,\n          \"remaining\": 150.00\n        }\n      ],\n      \"budgetByDay\": [\n        {\n          \"date\": \"2026-07-01\",\n          \"estimated\": 200.00,\n          \"actual\": 180.00,\n          \"remaining\": 20.00\n        }\n      ],\n      \"budgetByCategory\": {\n        \"STAY\": 800.00,\n        \"FOOD\": 500.50,\n        \"ACTIVITY\": 400.00,\n        \"TRANSPORT\": 100.00\n      }\n    }\n  }\n}"
+                        }
+                    ]
+                },
+                {
+                    "name": "Get Dashboard Overview",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/dashboard/overview",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "dashboard",
+                                "overview"
+                            ]
+                        },
+                        "description": "Get user dashboard with upcoming trips, stats, and popular cities"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "🌐 Sharing & Community",
+            "item": [
+                {
+                    "name": "Share Trip",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/trips/{{tripId}}/share",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "trips",
+                                "{{tripId}}",
+                                "share"
+                            ]
+                        },
+                        "description": "Generate a public shareable link for the trip"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Shared Trip (Public)",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/shared/:slug",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "shared",
+                                ":slug"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "slug",
+                                    "value": "abc123xyz",
+                                    "description": "Public slug from share"
+                                }
+                            ]
+                        },
+                        "description": "View shared trip - PUBLIC endpoint (no auth required)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Community Feed",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/community/feed?page=1&limit=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "community",
+                                "feed"
+                            ],
+                            "query": [
+                                {
+                                    "key": "page",
+                                    "value": "1"
+                                },
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                }
+                            ]
+                        },
+                        "description": "Get paginated community feed of shared trips"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Copy Shared Trip",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "POST",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/community/shared-trips/:sharedTripId/copy",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "community",
+                                "shared-trips",
+                                ":sharedTripId",
+                                "copy"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "sharedTripId",
+                                    "value": "shared-trip-uuid"
+                                }
+                            ]
+                        },
+                        "description": "Duplicate a shared trip to your account with all stops and activities"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "🛠️ Admin (ADMIN Role)",
+            "item": [
+                {
+                    "name": "Get Platform Stats",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/stats",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "stats"
+                            ]
+                        },
+                        "description": "Get platform-wide statistics (ADMIN only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Top Cities",
+                    "request": {
+                        "auth": {
+                            "type": "bearer",
+                            "bearer": [
+                                {
+                                    "key": "token",
+                                    "value": "{{authToken}}",
+                                    "type": "string"
+                                }
+                            ]
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/admin/top-cities?limit=10",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "admin",
+                                "top-cities"
+                            ],
+                            "query": [
+                                {
+                                    "key": "limit",
+                                    "value": "10"
+                                }
+                            ]
+                        },
+                        "description": "Get most popular cities by trip count (ADMIN only)"
+                    },
+                    "response": []
+                }
+            ]
+        },
+        {
+            "name": "❤️ Health Check",
+            "item": [
+                {
+                    "name": "Health Check",
+                    "request": {
+                        "auth": {
+                            "type": "noauth"
+                        },
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "http://localhost:3000/health",
+                            "protocol": "http",
+                            "host": [
+                                "localhost"
+                            ],
+                            "port": "3000",
+                            "path": [
+                                "health"
+                            ]
+                        },
+                        "description": "Check server and database health"
+                    },
+                    "response": []
+                }
+            ]
+        }
+    ]
+}

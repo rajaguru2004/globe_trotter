@@ -26,23 +26,23 @@ enum ActivityType {
   PAID
 }
 
-
 model City {
-  id               String    @id @default(uuid())
-  name             String
-  country          String
-  countryCode      String    // ISO 3166-1 alpha-2 (e.g., US, IN, FR)
-  latitude         Float
-  longitude        Float
-  costIndex        CostIndex
-  popularityScore  Int       @default(0)
-  isActive         Boolean   @default(true)
-  createdAt        DateTime  @default(now())
-  updatedAt        DateTime  @updatedAt
+  id              String    @id @default(uuid())
+  name            String
+  country         String
+  countryCode     String // ISO 3166-1 alpha-2 (e.g., US, IN, FR)
+  latitude        Float
+  longitude       Float
+  costIndex       CostIndex
+  popularityScore Int       @default(0)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   // Relations
-  activities       Activity[]
-  costReference    CostReference?
+  activities    Activity[]
+  costReference CostReference?
+  TripStop      TripStop[]
 
   @@index([name])
   @@index([country])
@@ -51,41 +51,40 @@ model City {
   @@map("city_master")
 }
 
-
 model ActivityCategory {
-  id          String     @id @default(uuid())
-  name        String     @unique
+  id          String   @id @default(uuid())
+  name        String   @unique
   description String?
-  icon        String?    // Icon identifier or path
-  isActive    Boolean    @default(true)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  icon        String? // Icon identifier or path
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
   // Relations
-  activities  Activity[]
+  activities Activity[]
 
   @@index([name])
   @@map("activity_category_master")
 }
 
-
 model Activity {
-  id               String           @id @default(uuid())
-  cityId           String
-  categoryId       String
-  name             String
-  description      String?
-  averageCost      Float?
-  durationInHours  Float?
-  activityType     ActivityType
-  popularityScore  Int              @default(0)
-  isActive         Boolean          @default(true)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
+  id              String       @id @default(uuid())
+  cityId          String
+  categoryId      String
+  name            String
+  description     String?
+  averageCost     Float?
+  durationInHours Float?
+  activityType    ActivityType
+  popularityScore Int          @default(0)
+  isActive        Boolean      @default(true)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
 
   // Foreign Keys & Relations
-  city             City             @relation(fields: [cityId], references: [id], onDelete: Cascade)
-  category         ActivityCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  city             City               @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  category         ActivityCategory   @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  ActivityInstance ActivityInstance[]
 
   @@index([name])
   @@index([cityId])
@@ -96,29 +95,27 @@ model Activity {
   @@map("activity_master")
 }
 
-
 model CostReference {
-  id                          String   @id @default(uuid())
-  cityId                      String   @unique
-  accommodationCostPerNight   Float    // Average hotel/accommodation cost
-  foodCostPerDay              Float    // Average daily food expense
-  localTransportCostPerDay    Float    // Average local transport (metro, bus, taxi)
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
+  id                        String   @id @default(uuid())
+  cityId                    String   @unique
+  accommodationCostPerNight Float // Average hotel/accommodation cost
+  foodCostPerDay            Float // Average daily food expense
+  localTransportCostPerDay  Float // Average local transport (metro, bus, taxi)
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 
   // Foreign Keys & Relations
-  city                        City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  city City @relation(fields: [cityId], references: [id], onDelete: Cascade)
 
   @@index([cityId])
   @@map("cost_reference_master")
 }
 
-
 model Currency {
   id                String   @id @default(uuid())
   code              String   @unique // ISO 4217 code (USD, INR, EUR, GBP, etc.)
-  symbol            String   // $, ₹, €, £
-  exchangeRateToUSD Float    // Current exchange rate to USD
+  symbol            String // $, ₹, €, £
+  exchangeRateToUSD Float // Current exchange rate to USD
   isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
@@ -126,4 +123,180 @@ model Currency {
   @@index([code])
   @@index([isActive])
   @@map("currency_master")
+}
+
+// ========================================
+// TRANSACTIONAL TABLES
+// ========================================
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum TripStatus {
+  DRAFT
+  UPCOMING
+  ONGOING
+  COMPLETED
+}
+
+enum ExpenseCategory {
+  STAY
+  FOOD
+  ACTIVITY
+  TRANSPORT
+}
+
+// User authentication and profile
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  firstName    String
+  lastName     String
+  profileImage String?
+  role         UserRole @default(USER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  trips          Trip[]
+  communityPosts CommunityPost[]
+
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+  @@map("users")
+}
+
+// User trip planning
+model Trip {
+  id          String     @id @default(uuid())
+  userId      String
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  coverImage  String?
+  status      TripStatus @default(DRAFT)
+  isDeleted   Boolean    @default(false)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Foreign Keys & Relations
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stops      TripStop[]
+  sharedTrip PublicSharedTrip?
+
+  @@index([userId])
+  @@index([status])
+  @@index([startDate])
+  @@index([isDeleted])
+  @@map("trips")
+}
+
+// Cities within a trip itinerary
+model TripStop {
+  id         String   @id @default(uuid())
+  tripId     String
+  cityId     String
+  startDate  DateTime
+  endDate    DateTime
+  orderIndex Int // For ordering stops in the trip
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  // Foreign Keys & Relations
+  trip       Trip               @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  city       City               @relation(fields: [cityId], references: [id], onDelete: Restrict)
+  activities ActivityInstance[]
+  expenses   Expense[]
+
+  @@index([tripId])
+  @@index([cityId])
+  @@index([orderIndex])
+  @@map("trip_stops")
+}
+
+// User-scheduled activities
+model ActivityInstance {
+  id               String   @id @default(uuid())
+  tripStopId       String
+  activityMasterId String
+  scheduledDate    DateTime
+  startTime        String? // Time in HH:mm format
+  durationInHours  Float?
+  estimatedCost    Float?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  // Foreign Keys & Relations
+  tripStop       TripStop  @relation(fields: [tripStopId], references: [id], onDelete: Cascade)
+  activityMaster Activity  @relation(fields: [activityMasterId], references: [id], onDelete: Restrict)
+  expenses       Expense[]
+
+  @@index([tripStopId])
+  @@index([activityMasterId])
+  @@index([scheduledDate])
+  @@map("activity_instances")
+}
+
+// Trip expenses tracking
+model Expense {
+  id                 String          @id @default(uuid())
+  activityInstanceId String? // Nullable - can be trip-level expense
+  tripStopId         String
+  category           ExpenseCategory
+  amount             Float
+  expenseDate        DateTime
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+
+  // Foreign Keys & Relations
+  activityInstance ActivityInstance? @relation(fields: [activityInstanceId], references: [id], onDelete: SetNull)
+  tripStop         TripStop          @relation(fields: [tripStopId], references: [id], onDelete: Cascade)
+
+  @@index([tripStopId])
+  @@index([category])
+  @@index([expenseDate])
+  @@map("expenses")
+}
+
+// Public trip sharing
+model PublicSharedTrip {
+  id         String   @id @default(uuid())
+  tripId     String   @unique
+  publicSlug String   @unique
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  // Foreign Keys & Relations
+  trip           Trip            @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  communityPosts CommunityPost[]
+
+  @@index([publicSlug])
+  @@index([tripId])
+  @@index([isActive])
+  @@map("public_shared_trips")
+}
+
+// Community shared trips feed
+model CommunityPost {
+  id           String   @id @default(uuid())
+  userId       String
+  sharedTripId String
+  title        String
+  description  String?
+  createdAt    DateTime @default(now())
+
+  // Foreign Keys & Relations
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sharedTrip PublicSharedTrip @relation(fields: [sharedTripId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sharedTripId])
+  @@index([createdAt])
+  @@map("community_posts")
 }

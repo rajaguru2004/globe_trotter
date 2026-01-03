@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: globetrotter_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: travelplanar
+      POSTGRES_PASSWORD: travelplanar_password
+      POSTGRES_DB: travelplanar_db
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U travelplanar -d travelplanar_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - globetrotter_network
+
+  # Backend API Service
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: globetrotter_backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      # Database connection
+      DATABASE_URL: "postgresql://travelplanar:travelplanar_password@postgres:5432/travelplanar_db?schema=public"
+
+      # Server configuration
+      PORT: 3000
+      NODE_ENV: production
+
+      # JWT configuration
+      JWT_SECRET: ${JWT_SECRET:-GlobeTrotter2026SecretKeyChangeThisInProduction!@#}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-15m}
+
+      # CORS
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-http://localhost:3000,http://localhost:5000}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})" ]
+      interval: 30s
+      timeout: 10s
+      start_period: 40s
+      retries: 3
+    networks:
+      - globetrotter_network
+    volumes:
+      # Mount logs directory (optional)
+      - ./logs:/app/logs
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  globetrotter_network:
+    driver: bridge
