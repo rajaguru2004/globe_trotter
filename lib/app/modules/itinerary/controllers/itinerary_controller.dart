@@ -11,6 +11,7 @@ import '../../../../core/mock/mock_activities.dart';
 class ItineraryController extends GetxController {
   final Rx<TripModel?> trip = Rx<TripModel?>(null);
   final RxBool isLoading = false.obs;
+  final RxBool isSaving = false.obs;
 
   String? tripId;
 
@@ -490,5 +491,42 @@ class ItineraryController extends GetxController {
   /// Navigate to share screen
   void goToShare() {
     Get.toNamed('/share', arguments: {'tripId': tripId});
+  }
+
+  /// Save trip
+  Future<void> saveTrip() async {
+    if (trip.value == null) return;
+
+    try {
+      isSaving.value = true;
+
+      // Simulate network delay
+      await Future.delayed(const Duration(milliseconds: 800));
+
+      // Update trip in mock data
+      MockTrips.updateTrip(trip.value!);
+
+      Get.snackbar(
+        'Success',
+        'Trip saved successfully',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        icon: const Icon(Icons.check_circle, color: Colors.white),
+        duration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to save trip',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+        icon: const Icon(Icons.error, color: Colors.white),
+        duration: const Duration(seconds: 2),
+      );
+    } finally {
+      isSaving.value = false;
+    }
   }
 }

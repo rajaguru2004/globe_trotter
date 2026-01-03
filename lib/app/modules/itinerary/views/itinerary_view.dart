@@ -16,9 +16,26 @@ class ItineraryView extends GetView<ItineraryController> {
       appBar: AppBar(
         title: Obx(() => Text(controller.trip.value?.name ?? 'Trip Itinerary')),
         actions: [
+          Obx(
+            () => IconButton(
+              icon: controller.isSaving.value
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      ),
+                    )
+                  : const Icon(Icons.save),
+              onPressed: controller.isSaving.value ? null : controller.saveTrip,
+              tooltip: 'Save Trip',
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.share),
             onPressed: controller.goToShare,
+            tooltip: 'Share',
           ),
         ],
       ),
