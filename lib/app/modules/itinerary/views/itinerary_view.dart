@@ -23,99 +23,148 @@ class ItineraryView extends GetView<ItineraryController> {
           ),
         ],
       ),
-      body: Obx(() {
-        if (controller.isLoading.value) {
-          return const Center(child: CircularProgressIndicator());
-        }
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFF00B4DB).withOpacity(0.1),
+              const Color(0xFF0083B0).withOpacity(0.05),
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: Obx(() {
+          if (controller.isLoading.value) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        final trip = controller.trip.value;
-        if (trip == null) {
-          return const EmptyState(
-            icon: Icons.error_outline,
-            message: 'Trip not found',
+          final trip = controller.trip.value;
+          if (trip == null) {
+            return const EmptyState(
+              icon: Icons.error_outline,
+              message: 'Trip not found',
+            );
+          }
+
+          return Column(
+            children: [
+              // Trip Header with improved gradient
+              _buildTripHeader(trip, theme),
+
+              // City Stops List
+              Expanded(
+                child: (trip.stops == null || trip.stops!.isEmpty)
+                    ? EmptyState(
+                        icon: Icons.location_city,
+                        message: 'No cities added yet',
+                        actionLabel: 'Add City',
+                        onActionPressed: () =>
+                            controller.showAddCitySheet(context),
+                      )
+                    : ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+                        itemCount: trip.stops!.length,
+                        itemBuilder: (context, index) {
+                          return _buildAnimatedCityStop(
+                            trip.stops![index],
+                            index,
+                            context,
+                            theme,
+                          );
+                        },
+                      ),
+              ),
+            ],
           );
-        }
-
-        return Column(
-          children: [
-            // Trip Header
-            _buildTripHeader(trip, theme),
-
-            // City Stops List
-            Expanded(
-              child: (trip.stops == null || trip.stops!.isEmpty)
-                  ? EmptyState(
-                      icon: Icons.location_city,
-                      message: 'No cities added yet',
-                      actionLabel: 'Add City',
-                      onActionPressed: () =>
-                          controller.showAddCitySheet(context),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: trip.stops!.length,
-                      itemBuilder: (context, index) {
-                        return _buildCityStop(
-                          trip.stops![index],
-                          index,
-                          context,
-                          theme,
-                        );
-                      },
-                    ),
-            ),
-
-            // Bottom Action Bar
-            _buildBottomBar(context, theme),
-          ],
-        );
-      }),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => controller.showAddCitySheet(context),
-        icon: const Icon(Icons.add_location_alt),
-        label: const Text('Add City'),
+        }),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: _buildBottomBar(context, theme),
     );
   }
 
   Widget _buildTripHeader(trip, ThemeData theme) {
     final dateFormat = DateFormat('MMM dd, yyyy');
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primaryContainer,
-            theme.colorScheme.surface,
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 600),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 20 * (1 - value)),
+            child: child,
+          ),
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFF00B4DB), // Teal
+              Color(0xFF0083B0), // Blue
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0083B0).withOpacity(0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
           ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
+        ),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white.withOpacity(0.9),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '${trip.numberOfDays} days • ${trip.numberOfCities} cities',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  '${dateFormat.format(trip.startDate)} - ${dateFormat.format(trip.endDate)}',
-                  style: theme.textTheme.bodyMedium,
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  '${trip.numberOfDays} days • ${trip.numberOfCities} cities',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
+    );
+  }
+
+  Widget _buildAnimatedCityStop(
+    stop,
+    int index,
+    BuildContext context,
+    ThemeData theme,
+  ) {
+    return TweenAnimationBuilder<double>(
+      duration: Duration(milliseconds: 400 + (index * 100)),
+      tween: Tween(begin: 0.0, end: 1.0),
+      builder: (context, value, child) {
+        return Opacity(
+          opacity: value,
+          child: Transform.translate(
+            offset: Offset(0, 30 * (1 - value)),
+            child: child,
           ),
-        ],
-      ),
+        );
+      },
+      child: _buildCityStop(stop, index, context, theme),
     );
   }
 
@@ -129,80 +178,92 @@ class ItineraryView extends GetView<ItineraryController> {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // City Header with Image
-          Stack(
-            children: [
-              AspectRatio(
-                aspectRatio: 16 / 9,
-                child: CachedNetworkImage(
-                  imageUrl:
-                      stop.city.imageUrl ??
-                      'https://source.unsplash.com/800x600/?${stop.city.name},city',
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) => Container(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    child: const Center(child: CircularProgressIndicator()),
-                  ),
-                  errorWidget: (context, url, error) => Container(
-                    color: theme.colorScheme.surfaceContainerHighest,
-                    child: const Icon(Icons.image_not_supported),
-                  ),
-                ),
-              ),
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [Colors.transparent, Colors.black.withOpacity(0.7)],
+          // City Header with Image and improved gradient overlay
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            child: Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: 16 / 9,
+                  child: CachedNetworkImage(
+                    imageUrl:
+                        stop.city.imageUrl ??
+                        'https://source.unsplash.com/800x600/?${stop.city.name},city',
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => Container(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: const Center(child: CircularProgressIndicator()),
+                    ),
+                    errorWidget: (context, url, error) => Container(
+                      color: theme.colorScheme.surfaceContainerHighest,
+                      child: const Icon(Icons.image_not_supported),
+                    ),
                   ),
                 ),
-                height: 200,
-              ),
-              Positioned(
-                left: 16,
-                right: 16,
-                bottom: 16,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.primary,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        'Day ${index + 1}',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onPrimary,
+                Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.transparent,
+                        Colors.black.withOpacity(0.5),
+                        Colors.black.withOpacity(0.8),
+                      ],
+                    ),
+                  ),
+                  height: 200,
+                ),
+                Positioned(
+                  left: 16,
+                  right: 16,
+                  bottom: 16,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF00B4DB), Color(0xFF0083B0)],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          'Day ${index + 1}',
+                          style: theme.textTheme.labelMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      stop.city.displayName,
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 8),
+                      Text(
+                        stop.city.displayName,
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    Text(
-                      '${dateFormat.format(stop.startDate)} - ${dateFormat.format(stop.endDate)}',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.9),
+                      Text(
+                        '${dateFormat.format(stop.startDate)} - ${dateFormat.format(stop.endDate)}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: Colors.white.withOpacity(0.9),
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           // Activities
@@ -220,14 +281,42 @@ class ItineraryView extends GetView<ItineraryController> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    TextButton.icon(
+                    _buildScaleButton(
                       onPressed: () => controller.showAddActivityDialog(index),
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text('Add'),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF00B4DB), Color(0xFF0083B0)],
+                          ),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.add,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Add',
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 12),
 
                 if (stop.activities == null || stop.activities!.isEmpty)
                   Padding(
@@ -249,26 +338,35 @@ class ItineraryView extends GetView<ItineraryController> {
                 // Cost Summary
                 if (stop.estimatedCost != null && stop.estimatedCost! > 0)
                   Container(
-                    margin: const EdgeInsets.only(top: 8),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.only(top: 12),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: theme.colorScheme.primaryContainer.withOpacity(
-                        0.3,
+                      gradient: LinearGradient(
+                        colors: [
+                          const Color(0xFF00B4DB).withOpacity(0.1),
+                          const Color(0xFF0083B0).withOpacity(0.1),
+                        ],
                       ),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: const Color(0xFF00B4DB).withOpacity(0.3),
+                        width: 1,
+                      ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           'Estimated Cost',
-                          style: theme.textTheme.bodyMedium,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                         Text(
                           '\$${stop.estimatedCost!.toStringAsFixed(2)}',
                           style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: theme.colorScheme.primary,
+                            color: const Color(0xFF0083B0),
                           ),
                         ),
                       ],
@@ -283,26 +381,53 @@ class ItineraryView extends GetView<ItineraryController> {
   }
 
   Widget _buildBottomBar(BuildContext context, ThemeData theme) {
-    return Material(
-      elevation: 8,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            _buildBottomButton(
-              icon: Icons.account_balance_wallet,
-              label: 'Budget',
-              onTap: controller.goToBudget,
-              theme: theme,
-            ),
-            _buildBottomButton(
-              icon: Icons.timeline,
-              label: 'Timeline',
-              onTap: controller.goToTimeline,
-              theme: theme,
-            ),
-          ],
+    return Container(
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF00B4DB), Color(0xFF0083B0)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF0083B0).withOpacity(0.3),
+            blurRadius: 12,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _buildScaleButton(
+                onPressed: () => controller.showAddCitySheet(context),
+                child: _buildBottomButton(
+                  icon: Icons.add_location_alt,
+                  label: 'Add City',
+                  theme: theme,
+                ),
+              ),
+              _buildScaleButton(
+                onPressed: controller.goToBudget,
+                child: _buildBottomButton(
+                  icon: Icons.account_balance_wallet,
+                  label: 'Budget',
+                  theme: theme,
+                ),
+              ),
+              _buildScaleButton(
+                onPressed: controller.goToTimeline,
+                child: _buildBottomButton(
+                  icon: Icons.timeline,
+                  label: 'Timeline',
+                  theme: theme,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -311,21 +436,44 @@ class ItineraryView extends GetView<ItineraryController> {
   Widget _buildBottomButton({
     required IconData icon,
     required String label,
-    required VoidCallback onTap,
     required ThemeData theme,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: theme.colorScheme.primary),
-            const SizedBox(height: 4),
-            Text(label, style: theme.textTheme.labelSmall),
-          ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: Colors.white, size: 28),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScaleButton({
+    required VoidCallback onPressed,
+    required Widget child,
+  }) {
+    return TweenAnimationBuilder<double>(
+      duration: const Duration(milliseconds: 100),
+      tween: Tween(begin: 1.0, end: 1.0),
+      builder: (context, scale, child) {
+        return Transform.scale(scale: scale, child: child);
+      },
+      child: GestureDetector(
+        onTapDown: (_) {},
+        onTapUp: (_) => onPressed(),
+        onTapCancel: () {},
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          child: child,
         ),
       ),
     );
